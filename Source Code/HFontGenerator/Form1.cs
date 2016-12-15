@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -100,12 +101,12 @@ namespace HFontGenerator
             String arrayBuffer = 
                 
                 "struct FONT "+_name.Text+";\n"
-                + "replaceThis.block_size = "+blockSize+";\n"
-                + "replaceThis.charCount = "+chrAmount+";\n"
-                + "replaceThis.charHeight = "+chrHeight+";\n"
-                + "replaceThis.charWidth = "+chrWidth+";\n"
-                + "replaceThis.name = \""+_name.Text+"\";\n"
-                + "replaceThis.chars[] = {\n";
+                + _name.Text + ".block_size = " + blockSize+";\n"
+                + _name.Text + ".charCount = "+chrAmount+";\n"
+                + _name.Text + ".charHeight = "+chrHeight+";\n"
+                + _name.Text + ".charWidth = "+chrWidth+";\n"
+                + _name.Text + ".name = \""+_name.Text+"\";\n"
+                + _name.Text + ".chars[] = {\n";
 
             int index = 0;
 
@@ -130,17 +131,25 @@ namespace HFontGenerator
                             //check data here
                             //goes from right to left, then down for cells
                             //goes from right to left, then down in cells
+                            // 0 * 6 + 0 = 0
+                            // 1 * 6 + 0 = 6
+                            // 2 * 6 + 0 = 12 
                             int cx = (col * chrWidth) + x;
                             int cy = (row * chrHeight) + y;
+                            int b = 0;
 
                             Color c = bmp.GetPixel(cx, cy);
                             if (c.R == 0 && c.G == 0 && c.B == 0)
                             {
+                                b = 1;
                                 hexBuffer += "1";
                             }else
                             {
+                                b = 0;
                                 hexBuffer += "0";
                             }
+
+                            Debug.Print("COLUMN[{0}] ROW[{1}] CX[{2}] CY[{3}] INDEX[{4}] BIT[{5}]", col, row, cx, cy, index,b);
 
                             if (bitC == bitCount - 1)
                             {
@@ -258,7 +267,7 @@ namespace HFontGenerator
                 + "\tuint8_t charHeight;\n"
                 + "\tuint8_t charWidth;\n"
                 + "\tchar *name;\n"
-                + "\t" + _blockType.SelectedItem.ToString() + " chars[];\n"
+                + "\t" + _blockType.SelectedItem.ToString().ToLower() + " chars[];\n"
                 + "};\n";
             Clipboard.SetText(definition);
             MessageBox.Show("Struct definition has been copied to your clipboard!", "Information",
